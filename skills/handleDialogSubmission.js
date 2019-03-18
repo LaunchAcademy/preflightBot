@@ -42,7 +42,7 @@ module.exports = function(controller) {
         submitCode(message)
         bot.whisper(message, 'Thanks for submitting! Keep going!')
         bot.dialogOk()
-        const conversations = bot.api.users.conversations({}, function(err,response) {
+        const conversations = bot.api.conversations.list({types: "private_channel"}, function(err,response) {
           const submissionsChannel = response.channels.find((channel) => {
             return channel.name === 'submissions'
           })
