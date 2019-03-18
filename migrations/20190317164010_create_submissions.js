@@ -3,7 +3,7 @@ exports.up = function(knex, Promise) {
   return knex.schema.createTable('submissions', function (table) {
     table.increments()
     table.string('url').notNullable()
-    table.integer('team_id').notNullable().references('assignments.id')
+    table.integer('assignment_id').notNullable().references('assignments.id')
     table.integer('user_id').notNullable().references('users.id')
     table.timestamps()
   })
