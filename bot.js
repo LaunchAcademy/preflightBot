@@ -87,6 +87,7 @@ if(process.env.REDISTOGO_URL) {
     host: rtg.hostname,
     password: rtg.auth.split(":")[1]
   })
+  bot_options.storage = redis
 }
 else {
   bot_options.json_file_store = __dirname + '/.data/db/'; // store user data in a simple JSON format
