@@ -48,7 +48,14 @@ module.exports = function(controller) {
           })
           if(submissionsChannel) {
             const text = `<@${message.raw_message.user.id}> submitted ${message.submission.url} for \`${message.state}\``
-            bot.say({ text, channel: submissionsChannel.id})
+            bot.say({ text, channel: submissionsChannel.id}, function(err, resp) {
+              if(err) {
+                console.log(`ERROR: ${err}`)
+              }
+            })
+          }
+          else {
+            console.log("submissions channel NOT FOUND!")
           }
         })
       } 
