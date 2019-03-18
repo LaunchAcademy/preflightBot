@@ -66,7 +66,7 @@ var bot_options = {
     clientSecret: process.env.clientSecret,
     clientSigningSecret: process.env.clientSigningSecret,
     // debug: true,
-    scopes: ['bot'],
+    scopes: ['bot', 'commands'],
     studio_token: process.env.studio_token,
     studio_command_uri: process.env.studio_command_uri
 };
