@@ -1,12 +1,45 @@
 const validUrl = require('../lib/validUrl')
 const dialogSubmittedEvent = require('../lib/dialogSubmittedEvent')
+const Submission = require('../lib/models/Submission')
+const User = require('../lib/models/User')
+const Assignment = require("../lib/models/Assignment")
 
+const db = require("../lib/db")
+
+const submitCode = async (message) => {
+  await db.bookshelf.transaction(async (t) => {
+    let user = new User({"chat_id": message.user, "channel_id": message.team.id})
+    const foundUser = await user.fetch({transacting: t})
+    if(foundUser) {
+      user = foundUser
+    }
+    user.set({name: message.raw_message.user.name})
+    await user.save(null, {transacting: t})
+
+    let assignment = new Assignment({slug: message.state})
+    let foundAssignment = await assignment.fetch({transacting: t})
+    if(!foundAssignment) {
+      await assignment.save(null, {transacting: t})
+    }
+    else {
+      assignment = foundAssignment
+    }
+
+    const submission = new Submission({
+      assignment_id: assignment.id, 
+      user_id: user.id, 
+      url: message.submission.url
+    })
+    await submission.save(null, {transacting: t})
+  })
+}
 module.exports = function(controller) {
   // create special handlers for certain actions in buttons
   // if the button action is 'say', act as if user said that thing
-  controller.middleware.receive.use(function(bot, message, next) {
+  controller.middleware.receive.use(async function(bot, message, next) {
     if(message.type === 'dialog_submission' && message.callback_id === dialogSubmittedEvent) {
       if(validUrl(message.submission.url)) {
+        submitCode(message)
         bot.whisper(message, 'Thanks for submitting! Keep going!')
         bot.dialogOk()
       } 
