@@ -42,6 +42,15 @@ module.exports = function(controller) {
         submitCode(message)
         bot.whisper(message, 'Thanks for submitting! Keep going!')
         bot.dialogOk()
+        const conversations = bot.api.users.conversations({}, function(err,response) {
+          const submissionsChannel = response.channels.find((channel) => {
+            return channel.name === 'submissions'
+          })
+          if(submissionsChannel) {
+            const text = `<@${message.raw_message.user.id}> submitted ${message.submission.url} for \`${message.state}\``
+            bot.say({ text, channel: submissionsChannel.id})
+          }
+        })
       } 
       else {
         bot.dialogError({name: 'url', error: 'Please specify a valid URL!'})
