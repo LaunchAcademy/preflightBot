@@ -47,8 +47,10 @@ This bot demonstrates many of the core features of Botkit:
     -> http://howdy.ai/botkit
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-var env = require('node-env-file');
-env(__dirname + '/.env');
+if(process.env.NODE_ENV !== "production") {
+  var env = require('node-env-file');
+  env(__dirname + '/.env');
+}
 
 
 if (!process.env.clientId || !process.env.clientSecret || !process.env.PORT) {
@@ -64,18 +66,31 @@ var bot_options = {
     clientSecret: process.env.clientSecret,
     clientSigningSecret: process.env.clientSigningSecret,
     // debug: true,
-    scopes: ['bot'],
+    scopes: ['bot', 'commands'],
     studio_token: process.env.studio_token,
     studio_command_uri: process.env.studio_command_uri
 };
 
 // Use a mongo database if specified, otherwise store in a JSON file local to the app.
 // Mongo is automatically configured when deploying to Heroku
-if (process.env.MONGO_URI) {
-    var mongoStorage = require('botkit-storage-mongo')({mongoUri: process.env.MONGO_URI});
-    bot_options.storage = mongoStorage;
-} else {
-    bot_options.json_file_store = __dirname + '/.data/db/'; // store user data in a simple JSON format
+// if (process.env.MONGO_URI) {
+//     var mongoStorage = require('botkit-storage-mongo')({mongoUri: process.env.MONGO_URI});
+//     bot_options.storage = mongoStorage;
+// } else {
+//     bot_options.json_file_store = __dirname + '/.data/db/'; // store user data in a simple JSON format
+// }
+
+if(process.env.REDISTOGO_URL) {
+  const rtg   = require("url").parse(process.env.REDISTOGO_URL);
+  const redis = require("botkit-storage-redis")({
+    port: rtg.port, 
+    host: rtg.hostname,
+    password: rtg.auth.split(":")[1]
+  })
+  bot_options.storage = redis
+}
+else {
+  bot_options.json_file_store = __dirname + '/.data/db/'; // store user data in a simple JSON format
 }
 
 // Create the Botkit controller, which controls all instances of the bot.

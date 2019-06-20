@@ -1,7 +1,7 @@
 - Users
   * chat_id
   * name
-  * channel_id
+  * team_id
   * *has_many* submissions
 - Lessons
   * slug

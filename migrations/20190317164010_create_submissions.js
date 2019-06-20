@@ -1,6 +1,6 @@
 
 exports.up = function(knex, Promise) {
-  knex.schema.createTable('submissions', function (table) {
+  return knex.schema.createTable('submissions', function (table) {
     table.increments()
     table.string('url').notNullable()
     table.integer('assignment_id').notNullable().references('assignments.id')
@@ -10,5 +10,5 @@ exports.up = function(knex, Promise) {
 };
 
 exports.down = function(knex, Promise) {
-  
+  return knex.schema.dropTable('submissions')
 };
